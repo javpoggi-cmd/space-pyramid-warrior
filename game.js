@@ -11,17 +11,26 @@ document.addEventListener('DOMContentLoaded', () => {
     gameContainer.appendChild(canvas);
 
     // --- Variables de Escala ---
-    const BASE_WIDTH = 1920; // AUMENTADO: Usa una resolución de escritorio como base.
+    const BASE_WIDTH = 1920; 
+    const MOBILE_ZOOM_LEVEL = 1.3; // <-- NUEVA CONSTANTE: AJUSTA ESTE VALOR (1.3 = 30% más grande)
     let scaleFactor = 1;
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         scaleFactor = canvas.width / BASE_WIDTH;
-        scaleFactor = Math.min(scaleFactor, 1.0); // AÑADIDO: Limita la escala para que no supere el 100%.
+
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Si es un dispositivo táctil, aplicamos el zoom adicional.
+        if (isTouchDevice()) {
+            scaleFactor *= MOBILE_ZOOM_LEVEL;
+        }
+        // --- FIN DE LA MODIFICACIÓN ---
+
+        scaleFactor = Math.min(scaleFactor, 1.0); // Limita la escala para que no supere el 100%.
     }
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Llamada inicial para establecer el tamaño y el scaleFactor
+    resizeCanvas(); 
 
     // =========================================================================
     // --- 1. MEJORA DE CÓDIGO: OBJETO DE CONFIGURACIÓN CENTRALIZADO ---
@@ -624,101 +633,4 @@ document.addEventListener('DOMContentLoaded', () => {
     function createChainedExplosions(target, isIntro = false) { playSound(audioAssets.bossExplosion || audioAssets.explosionLarge); const numExplosions = isIntro ? 20 : 15; for (let i = 0; i < numExplosions; i++) { setTimeout(() => { const exX = target.x + Math.random() * target.width; const exY = target.y + Math.random() * target.height; const exSize = (Math.random() * 0.4 + 0.2) * target.width; explosions.push(new Explosion(exX, exY, exSize)); if(i % 3 === 0) playSound(audioAssets.explosionLarge, 0.5); }, i * 80); } }
     function spawnEnemies() { if(!allowSpawning) return; const enemiesToSpawn = (enemyDestroyedCount > 0 && enemyDestroyedCount % 3 === 0) ? 2 : 1; for (let i = 0; i < enemiesToSpawn; i++) { const randomType = Math.floor(Math.random() * 7) + 1; if (randomType === 7) { setTimeout(() => { if(gameRunning) enemies.push(new Enemy(7)); }, 500); break; } else { setTimeout(() => { if(gameRunning) enemies.push(new Enemy(randomType)); }, 500); } } }
     function triggerScreenFlash(duration = 240, intensity = 0.7) { const flash = document.createElement('div'); Object.assign(flash.style, { position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: '999', pointerEvents: 'none', transition: 'background-color 0.05s' }); gameContainer.appendChild(flash); setTimeout(() => { flash.style.backgroundColor = `rgba(255, 255, 255, ${intensity})`; }, 0); setTimeout(() => { flash.style.backgroundColor = 'rgba(0, 0, 0, 0)'; }, duration / 2); setTimeout(() => { if (gameContainer.contains(flash)) { gameContainer.removeChild(flash); } }, duration); }
-    function showGameOverScreen() { const highScore = localStorage.getItem('spaceShooterHighScore') || 0; if (score > highScore) { localStorage.setItem('spaceShooterHighScore', score); } const bossHighScore = localStorage.getItem('spaceShooterBossHighScore') || 0; if (bossesDestroyed > bossHighScore) { localStorage.setItem('spaceShooterBossHighScore', bossesDestroyed); } const gameOverDiv = document.createElement('div'); gameOverDiv.id = 'gameOverScreen'; Object.assign(gameOverDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100' }); gameOverDiv.innerHTML = ` <h1 style="color: #ff4444; font-size: 3.5em;">GAME OVER</h1> <p style="font-size: 1.8em;">Tu puntaje: ${score}</p> <p style="font-size: 1.2em;">Puntaje Máximo: ${localStorage.getItem('spaceShooterHighScore') || 0}</p> <p style="font-size: 1.2em; color: #ffaa00;">Récord de Jefes: ${localStorage.getItem('spaceShooterBossHighScore') || 0}</p> <button id="restartButton">Volver al Menú</button> `; gameContainer.appendChild(gameOverDiv); const restartButton = document.getElementById('restartButton'); Object.assign(restartButton.style, { padding: '15px 30px', fontSize: '1.5em', cursor: 'pointer', backgroundColor: '#00ff00', color: '#000', border: 'none', borderRadius: '5px', marginTop: '20px' }); restartButton.onclick = () => { gameContainer.removeChild(gameOverDiv); lobby.style.display = 'block'; canvas.style.display = 'none'; updateLobbyUI(); }; }
-    
-    let endingState = { currentImage: 0, alpha: 0, phase: 'exploding', timer: 0 }; const endingTitles = [ "Space Pyramid Warrior Vs The Incectisoids from the 9th Dimension", "Producido por Zowie Pixel Arts", "Creación del Juego Javier Poggi", "Gracias por Jugar (˶˃ ᵕ ˂˶)" ]; function startEndingSequence() { playMusic(audioAssets.endingMusic); gameState = 'ENDING'; gameRunning = false; enemies = []; enemyBullets = []; asteroids = []; bosses = []; powerUps = []; let flashCount = 0; const flashInterval = setInterval(() => { triggerScreenFlash(150, 0.5); flashCount++; if (flashCount > 9) clearInterval(flashInterval); }, 200); setTimeout(() => { for (let i = 0; i < 5; i++) { setTimeout(() => { const exX = Math.random() * canvas.width; const exY = Math.random() * canvas.height; explosions.push(new Explosion(exX, exY, Math.random() * 200 + 100)); }, i * 100); } }, 1000); endingState = { currentImage: 1, alpha: 0, phase: 'fade-in', timer: Date.now() }; setTimeout(() => requestAnimationFrame(endingLoop), 3000); } function endingLoop() { if (gameState !== 'ENDING' && gameState !== 'POST_ENDING') return; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); stars.forEach(s => { s.update(0,0); s.draw(); }); explosions.forEach((ex, i) => { ex.update(); if (ex.life <= 0) explosions.splice(i, 1); else ex.draw(); }); const img = assets[`ending${endingState.currentImage}`]; if (img && gameState === 'ENDING') { const elapsedTime = Date.now() - endingState.timer; if (endingState.phase === 'fade-in') { endingState.alpha = Math.min(1, elapsedTime / 3000); if (endingState.alpha >= 1) { endingState.phase = 'hold'; endingState.timer = Date.now(); } } else if (endingState.phase === 'hold') { if (elapsedTime > 4000) { endingState.phase = 'fade-out'; endingState.timer = Date.now(); } } else if (endingState.phase === 'fade-out') { endingState.alpha = Math.max(0, 1 - (elapsedTime / 3000)); if (endingState.alpha <= 0) { endingState.currentImage++; if (assets[`ending${endingState.currentImage}`]) { endingState.phase = 'fade-in'; endingState.timer = Date.now(); } else { gameState = 'POST_ENDING'; for (let i = 0; i < 5; i++) { setTimeout(() => { const exX = Math.random() * canvas.width; const exY = Math.random() * canvas.height; explosions.push(new Explosion(exX, exY, Math.random() * 250 + 50)); }, i * 100); } setTimeout(showVictoryScreen, 3000); } } } ctx.globalAlpha = endingState.alpha; const scale = Math.min(canvas.width / img.width, canvas.height / img.height); const w = img.width * scale; const h = img.height * scale; ctx.drawImage(img, canvas.width/2 - w/2, canvas.height/2 - h/2, w, h); const titleIndex = endingState.currentImage - 1; if (endingTitles[titleIndex]) { const title = endingTitles[titleIndex]; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; const fontSize = (titleIndex === 0) ? Math.max(24, Math.floor(canvas.width / 45)) : Math.max(32, Math.floor(canvas.width / 40)); ctx.font = `bold ${fontSize}px Arial`; ctx.shadowColor = 'black'; ctx.shadowBlur = 10; ctx.fillText(title, canvas.width / 2, canvas.height * 0.85); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; } ctx.globalAlpha = 1; } requestAnimationFrame(endingLoop); } function showVictoryScreen() { const victoryDiv = document.createElement('div'); victoryDiv.id = 'victoryScreen'; Object.assign(victoryDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 20, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100', border: '2px solid #00ff00' }); victoryDiv.innerHTML = ` <h1 style="color: #00ff00; font-size: 3.5em; text-shadow: 2px 2px 8px #0f0;">¡VICTORIA!</h1> <p style="font-size: 1.8em;">Has derrotado a los insectoides de la 9ª Dimensión.</p> <p style="font-size: 1.5em;">Puntaje Final: ${score}</p> <button id="restartButton">Volver al Menú</button> `; gameContainer.appendChild(victoryDiv); const restartButton = document.getElementById('restartButton'); Object.assign(restartButton.style, { padding: '15px 30px', fontSize: '1.5em', cursor: 'pointer', backgroundColor: '#00ff00', color: '#000', border: 'none', borderRadius: '5px', marginTop: '20px' }); restartButton.onclick = () => { gameContainer.removeChild(victoryDiv); lobby.style.display = 'block'; canvas.style.display = 'none'; updateLobbyUI(); }; }
-    
-    // --- Lógica de Inicio y Menús ---
-    async function startGame(startProgressionIndex = 0) { lobby.innerHTML = '<h1>Cargando...</h1>'; try { await preloadAssets(); lobby.style.display = 'none'; canvas.style.display = 'block'; if (isTouchDevice()) setupTouchControls(); initGame(startProgressionIndex); } catch (error) { lobby.innerHTML = `<h1>Error al cargar imágenes</h1><p>${error}</p>`; console.error("Error durante la precarga de assets:", error); } }
-    function updateLobbyUI() { playMusic(audioAssets.introMusic); const bossHighScore = localStorage.getItem('spaceShooterBossHighScore') || 0; const highScore = localStorage.getItem('spaceShooterHighScore') || 0; lobby.innerHTML = ` <h1 style="font-size: 2.5em; line-height: 1.2; margin-bottom: 20px;">Space Pyramid Warrior Vs the Insectoids From 9th Dimension</h1> <h2>Puntaje Máximo: <span style="color: #00ff00;">${highScore}</span></h2> <h3>Récord de Jefes: <span style="color: #ffaa00;">${bossHighScore}</span></h3> <div id="difficultySelector" style="margin: 20px 0; color: #00ff00;"></div> <div id="soundControls" style="margin: 20px 0;"></div> <button id="startButton" style="margin-top: 20px;">¡Comenzar Juego!</button> <div id="cheatContainer" style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;"></div> `; lobby.querySelector('#startButton').addEventListener('click', () => startGame()); const difficultyContainer = lobby.querySelector('#difficultySelector'); const difficultyLabel = document.createElement('label'); difficultyLabel.htmlFor = 'difficultySlider'; difficultyLabel.id = 'difficultyLabel'; difficultyLabel.style.display = 'block'; difficultyLabel.style.marginBottom = '10px'; difficultyLabel.style.fontSize = '1.2em'; const difficultySlider = document.createElement('input'); difficultySlider.type = 'range'; difficultySlider.id = 'difficultySlider'; difficultySlider.min = 0; difficultySlider.max = 5; difficultySlider.value = difficultyLevel; difficultyLabel.textContent = `Dificultad: ${difficultySettings[difficultyLevel].name}`; difficultySlider.addEventListener('input', (e) => { difficultyLevel = parseInt(e.target.value); lobby.querySelector('#difficultyLabel').textContent = `Dificultad: ${difficultySettings[difficultyLevel].name}`; }); difficultyContainer.appendChild(difficultyLabel); difficultyContainer.appendChild(difficultySlider); const soundControls = lobby.querySelector('#soundControls'); const musicButton = document.createElement('button'); musicButton.textContent = `Música: ${isMusicOn ? 'ON' : 'OFF'}`; musicButton.onclick = () => { isMusicOn = !isMusicOn; musicButton.textContent = `Música: ${isMusicOn ? 'ON' : 'OFF'}`; if(!isMusicOn){ playMusic(null); } else { playMusic(audioAssets.introMusic); } }; const sfxButton = document.createElement('button'); sfxButton.textContent = `SFX: ${isSfxOn ? 'ON' : 'OFF'}`; sfxButton.onclick = () => { isSfxOn = !isSfxOn; sfxButton.textContent = `SFX: ${isSfxOn ? 'ON' : 'OFF'}`; }; [musicButton, sfxButton].forEach(btn => { Object.assign(btn.style, { padding: '10px 20px', fontSize: '1em', cursor: 'pointer', backgroundColor: '#333', color: '#fff', border: '1px solid #fff', borderRadius: '5px', margin: '0 10px' }); soundControls.appendChild(btn); }); const createSlider = (labelText, volumeVar, callback) => { const container = document.createElement('div'); container.style.marginTop = '15px'; const label = document.createElement('label'); label.textContent = labelText; label.style.marginRight = '10px'; const slider = document.createElement('input'); slider.type = 'range'; slider.min = '0'; slider.max = '1'; slider.step = '0.05'; slider.value = volumeVar; slider.addEventListener('input', callback); container.appendChild(label); container.appendChild(slider); return container; }; const musicSlider = createSlider('Volumen Música:', musicVolume, (e) => { musicVolume = parseFloat(e.target.value); if (audioAssets.introMusic && !audioAssets.introMusic.paused) { audioAssets.introMusic.volume = musicVolume; } }); const sfxSlider = createSlider('Volumen SFX:', sfxVolume, (e) => { sfxVolume = parseFloat(e.target.value); }); soundControls.appendChild(musicSlider); soundControls.appendChild(sfxSlider); const cheatContainer = lobby.querySelector('#cheatContainer'); const cheatToggleButton = document.createElement('button'); cheatToggleButton.textContent = `Cheat Mode: ${cheatModeActive ? 'ON' : 'OFF'}`; Object.assign(cheatToggleButton.style, { backgroundColor: cheatModeActive ? '#ff4444' : '#555', color: '#fff', border: 'none', padding: '10px 20px', cursor: 'pointer', borderRadius: '5px', marginBottom: '10px' }); cheatToggleButton.onclick = () => { cheatModeActive = !cheatModeActive; updateLobbyUI(); }; cheatContainer.appendChild(cheatToggleButton); if (cheatModeActive) { const cheatButtonsContainer = document.createElement('div'); cheatButtonsContainer.style.marginTop = '15px'; const createCheatButton = (text, index, isToggle = false) => { const button = document.createElement('button'); button.textContent = text; Object.assign(button.style, { margin: '5px', padding: '8px 12px', cursor: 'pointer', backgroundColor: '#8a2be2', color: 'white', border: 'none', borderRadius: '3px' }); if (isToggle) { button.style.backgroundColor = applyAllPowerupsCheat ? '#00ff00' : '#8a2be2'; button.onclick = () => { applyAllPowerupsCheat = !applyAllPowerupsCheat; updateLobbyUI(); }; } else { button.onclick = () => startFromCheat(index); } cheatButtonsContainer.appendChild(button); }; createCheatButton(`Empezar con Todo: ${applyAllPowerupsCheat ? 'ON' : 'OFF'}`, 0, true); createCheatButton('Super-Boss 1', bossProgression.length); createCheatButton('Super-Boss 2', bossProgression.length + 1); createCheatButton('Super-Boss 3', bossProgression.length + 2); createCheatButton('Super-Boss 4', bossProgression.length + 3); createCheatButton('Giga-Boss', bossProgression.length + 4); createCheatButton('Final Boss', bossProgression.length + 5); cheatContainer.appendChild(cheatButtonsContainer); } }
-    async function startFromCheat(progressionJumpIndex) { lobby.innerHTML = '<h1>Cargando...</h1>'; try { await preloadAssets(); if (isTouchDevice()) setupTouchControls(); initGame(progressionJumpIndex); gameState = 'METEOR_SHOWER'; handleGameStateChange(); lobby.style.display = 'none'; canvas.style.display = 'block'; } catch (error) { console.error("Error al iniciar con truco:", error); } }
-    let introStartTime; async function initIntro() { appState = 'INTRO'; startScreen.style.display = 'none'; canvas.style.display = 'block'; await Promise.all([preloadAssets(), preloadAudio()]); introStartTime = Date.now(); playMusic(audioAssets.introMusic); introLoop(); }
-    function introLoop() { if (appState !== 'INTRO') return; const elapsedTime = Date.now() - introStartTime; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); if (assets.introScreen) { if (elapsedTime < 10000) { ctx.globalAlpha = (elapsedTime < 5000) ? (elapsedTime / 5000) : 1; } else if (elapsedTime < 11000) { ctx.globalAlpha = 1 - (elapsedTime - 10000) / 1000; if (elapsedTime % 200 < 50) { ctx.fillStyle = 'white'; ctx.fillRect(0,0,canvas.width, canvas.height); } if (!explosions.length) { createChainedExplosions({x: canvas.width/2, y: canvas.height/2, width: canvas.width, height: canvas.height}, true); } } else { appState = 'LOBBY'; canvas.style.display = 'none'; lobby.style.display = 'block'; updateLobbyUI(); return; } const img = assets.introScreen; const startScale = 0.30; const endScale = 0.95; const animationDuration = 10000; let currentScale = startScale + (endScale - startScale) * (elapsedTime / animationDuration); currentScale = Math.min(currentScale, endScale); const newWidth = img.width * currentScale; const newHeight = img.height * currentScale; ctx.drawImage(img, canvas.width / 2 - newWidth / 2, canvas.height / 2 - newHeight / 2, newWidth, newHeight); ctx.globalAlpha = 1; } explosions.forEach((ex, i) => { ex.update(); ex.draw(); if (ex.life <= 0) explosions.splice(i, 1); }); requestAnimationFrame(introLoop); }
-    
-    // --- Manejo de Controles ---
-    function launchMissile() {
-        if (player && gameRunning && !isPaused && missileCharges > 0) {
-            const target = findNearestTarget(player.x, player.y);
-            if (target) {
-                missiles.push(new Missile(player.x + player.width / 2 - (10 * scaleFactor), player.y, target));
-                missileCharges--;
-                playSound(audioAssets.missileLaunch);
-            }
-        }
-    }
-
-    window.addEventListener('keydown', (e) => { const key = e.key.toLowerCase(); keys[key] = true; if (key === ' ' && player && gameRunning && !isPaused) { player.shoot(); } if (key === 'control' && player && gameRunning && !isPaused) { e.preventDefault(); launchMissile(); } if (key === 'escape' && gameRunning) { togglePause(); } });
-    window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
-    
-    let touchMoveX = 0, touchMoveY = 0, isShooting = false;
-
-    function isTouchDevice() {
-        return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    }
-
-    function setupTouchControls() {
-        const joystick = document.createElement('div');
-        joystick.id = 'joystick';
-        const stick = document.createElement('div');
-        stick.id = 'stick';
-        joystick.appendChild(stick);
-        gameContainer.appendChild(joystick);
-
-        const actionButton = document.createElement('div');
-        actionButton.id = 'actionButton';
-        actionButton.className = 'touch-button';
-        gameContainer.appendChild(actionButton);
-
-        const missileButton = document.createElement('div');
-        missileButton.id = 'missileButton';
-        missileButton.className = 'touch-button';
-        gameContainer.appendChild(missileButton);
-
-        let joystickActive = false;
-        let joystickStartX, joystickStartY;
-        joystick.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            joystickActive = true;
-            const touch = e.changedTouches[0];
-            joystickStartX = touch.clientX;
-            joystickStartY = touch.clientY;
-        }, { passive: false });
-
-        joystick.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!joystickActive) return;
-            const touch = e.changedTouches[0];
-            const deltaX = touch.clientX - joystickStartX;
-            const deltaY = touch.clientY - joystickStartY;
-            const maxDistance = joystick.offsetWidth / 3;
-            const angle = Math.atan2(deltaY, deltaX);
-            const distance = Math.hypot(deltaX, deltaY);
-
-            const limitedDistance = Math.min(distance, maxDistance);
-            const stickX = Math.cos(angle) * limitedDistance;
-            const stickY = Math.sin(angle) * limitedDistance;
-            
-            stick.style.transform = `translate(${stickX}px, ${stickY}px)`;
-            
-            touchMoveX = (deltaX / maxDistance);
-            touchMoveY = (deltaY / maxDistance);
-            touchMoveX = Math.max(-1, Math.min(1, touchMoveX));
-            touchMoveY = Math.max(-1, Math.min(1, touchMoveY));
-        }, { passive: false });
-        
-        const resetJoystick = () => {
-            joystickActive = false;
-            stick.style.transform = 'translate(0, 0)';
-            touchMoveX = 0;
-            touchMoveY = 0;
-        };
-        joystick.addEventListener('touchend', resetJoystick);
-        joystick.addEventListener('touchcancel', resetJoystick);
-
-        actionButton.addEventListener('touchstart', (e) => { e.preventDefault(); isShooting = true; }, { passive: false });
-        actionButton.addEventListener('touchend', () => { isShooting = false; });
-        missileButton.addEventListener('touchstart', (e) => { e.preventDefault(); launchMissile(); }, { passive: false });
-    }
-
-    initButton.onclick = initIntro;
-});
+    function showGameOverScreen() { const highScore = localStorage.getItem('spaceShooterHighScore') || 0; if (score > highScore) { localStorage.setItem('spaceShooterHighScore', score); } const bossHighScore = localStorage.getItem('spaceShooterBossHighScore') || 0; if (bossesDestroyed > bossHighScore) { localStorage.setItem('spaceShooterBossHighScore', bossesDestroyed); } const gameOverDiv = document.createElement('div'); gameOverDiv.id = 'gameOverScreen'; Object.assign(gameOverDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100' }); gameOverDiv.innerHTML = ` <h1 style="color: #ff4444; font-size: 3.5em;">GAME OVER</h1> <p style="font-size: 1.8em;">Tu puntaje: ${score}</p> <p style="font-size: 1.2em;">Puntaje Máximo: ${localStorage.getItem('spaceShooterHighScore') || 0}</p> <p style. ..
