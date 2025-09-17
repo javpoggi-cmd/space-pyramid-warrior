@@ -1,15 +1,11 @@
 /* --- Estilos Base (Mobile-First) --- */
 body {
+    /* CLAVE: Se han quitado las reglas de flexbox, height y overflow de aquí */
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     background-color: #000;
     color: #fff;
     font-family: 'Arial', sans-serif;
-    overflow: hidden; /* Evita barras de scroll en el body */
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10+ */
     user-select: none; /* Standard syntax */
@@ -21,19 +17,20 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
-    width: 100%; /* Ocupa todo el ancho */
-    min-height: 100vh; /* CLAVE: Permite que el contenedor crezca si el contenido es muy alto */
-    overflow-y: auto; /* CLAVE: Añade scroll vertical SOLO si el contenido se desborda */
-    padding: 20px; /* Añade padding general para que nada toque los bordes */
+    width: 100%;
+    min-height: 100vh; /* Ocupa al menos toda la pantalla */
+    overflow-y: auto;   /* Permite scroll si el contenido es más alto */
+    padding: 20px;
     box-sizing: border-box;
 }
 
 h1 {
-    /* CLAVE: Tamaño de fuente que se adapta al ancho de la pantalla pero con límites */
     font-size: clamp(1.5em, 7vw, 2.5em); 
     line-height: 1.2;
     color: #00ff00;
     text-shadow: 2px 2px 4px #000;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 #initButton, #startButton {
@@ -46,7 +43,7 @@ h1 {
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 255, 0, 0.4);
     transition: all 0.2s ease-in-out;
-    flex-shrink: 0; /* Evita que los botones se encojan */
+    flex-shrink: 0; 
 }
 
 #initButton:hover, #startButton:hover {
@@ -63,7 +60,7 @@ canvas {
 /* --- Estilos para Tablets y PC (Pantallas más grandes) --- */
 @media (min-width: 769px) {
     h1 {
-        font-size: 3em; /* Restaura el tamaño grande para PC */
+        font-size: 3em; 
         max-width: 900px; 
     }
 
