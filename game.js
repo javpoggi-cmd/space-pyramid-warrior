@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Variables de Escala ---
     const BASE_WIDTH = 1920; 
-    const MOBILE_ZOOM_LEVEL = 1.3; // <-- NUEVA CONSTANTE: AJUSTA ESTE VALOR (1.3 = 30% más grande)
+    const MOBILE_ZOOM_LEVEL = 1.8; // <-- NUEVA CONSTANTE: AJUSTA ESTE VALOR (1.3 = 30% más grande)
     let scaleFactor = 1;
 
     function resizeCanvas() {
@@ -634,3 +634,4 @@ document.addEventListener('DOMContentLoaded', () => {
     function spawnEnemies() { if(!allowSpawning) return; const enemiesToSpawn = (enemyDestroyedCount > 0 && enemyDestroyedCount % 3 === 0) ? 2 : 1; for (let i = 0; i < enemiesToSpawn; i++) { const randomType = Math.floor(Math.random() * 7) + 1; if (randomType === 7) { setTimeout(() => { if(gameRunning) enemies.push(new Enemy(7)); }, 500); break; } else { setTimeout(() => { if(gameRunning) enemies.push(new Enemy(randomType)); }, 500); } } }
     function triggerScreenFlash(duration = 240, intensity = 0.7) { const flash = document.createElement('div'); Object.assign(flash.style, { position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: '999', pointerEvents: 'none', transition: 'background-color 0.05s' }); gameContainer.appendChild(flash); setTimeout(() => { flash.style.backgroundColor = `rgba(255, 255, 255, ${intensity})`; }, 0); setTimeout(() => { flash.style.backgroundColor = 'rgba(0, 0, 0, 0)'; }, duration / 2); setTimeout(() => { if (gameContainer.contains(flash)) { gameContainer.removeChild(flash); } }, duration); }
     function showGameOverScreen() { const highScore = localStorage.getItem('spaceShooterHighScore') || 0; if (score > highScore) { localStorage.setItem('spaceShooterHighScore', score); } const bossHighScore = localStorage.getItem('spaceShooterBossHighScore') || 0; if (bossesDestroyed > bossHighScore) { localStorage.setItem('spaceShooterBossHighScore', bossesDestroyed); } const gameOverDiv = document.createElement('div'); gameOverDiv.id = 'gameOverScreen'; Object.assign(gameOverDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100' }); gameOverDiv.innerHTML = ` <h1 style="color: #ff4444; font-size: 3.5em;">GAME OVER</h1> <p style="font-size: 1.8em;">Tu puntaje: ${score}</p> <p style="font-size: 1.2em;">Puntaje Máximo: ${localStorage.getItem('spaceShooterHighScore') || 0}</p> <p style. ..
+
