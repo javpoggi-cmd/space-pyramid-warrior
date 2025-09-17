@@ -1,35 +1,30 @@
-const CACHE_NAME = 'sp-warrior-cache-v1';
-// Lista de todos los archivos que componen tu juego
+const CACHE_NAME = 'sp-warrior-cache-v2'; // <--- VERSIÓN ACTUALIZADA
+// Lista de los archivos esenciales para que el juego inicie
 const urlsToCache = [
   '/',
   'index.html',
   'style.css',
   'game.js',
-  // ¡No olvides agregar tus imágenes y sonidos más importantes!
-  // Es una buena práctica cachear los assets principales.
-  'img/player.png',
-  'img/enemy1.png',
-  'audio/background_music.mp3',
-  'audio/player_shoot.wav'
+  'img/player.png'
+  // Para una mejor experiencia offline, puedes agregar más imágenes y sonidos aquí.
 ];
 
-// Evento de instalación: se abre el caché y se guardan los archivos
+// Instala el Service Worker y guarda los archivos en el caché
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache abierto');
+        console.log('Cache abierto: ', CACHE_NAME);
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// Evento de fetch: responde con los archivos del caché si están disponibles
+// Intercepta las peticiones y responde con los archivos del caché si es posible
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Si el archivo está en el caché, lo devuelve. Si no, lo busca en la red.
         return response || fetch(event.request);
       })
   );
