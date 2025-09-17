@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     gameContainer.appendChild(canvas);
 
     // --- Variables de Escala ---
-    const BASE_WIDTH = 1280; // Ancho de referencia para el diseño del juego
+    const BASE_WIDTH = 1920; // AUMENTADO: Usa una resolución de escritorio como base.
     let scaleFactor = 1;
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         scaleFactor = canvas.width / BASE_WIDTH;
-        // En un juego más complejo, aquí se podrían reposicionar los elementos si el juego está activo
+        scaleFactor = Math.min(scaleFactor, 1.0); // AÑADIDO: Limita la escala para que no supere el 100%.
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas(); // Llamada inicial para establecer el tamaño y el scaleFactor
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // --- 1. MEJORA DE CÓDIGO: OBJETO DE CONFIGURACIÓN CENTRALIZADO ---
     // =========================================================================
-    // NOTA: Los valores base ahora se multiplicarán por scaleFactor donde sea necesario
     const GAME_CONFIG = {
         player: {
             speed: 7,
@@ -240,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initGame(startProgressionIndex = 0) {
+        // Recalcular tamaños en caso de que la ventana haya cambiado antes de iniciar
+        resizeCanvas();
+        
         resetPlayerStats(true);
         enemySpeedMultiplier = 1.0; 
         allowSpawning = true;
