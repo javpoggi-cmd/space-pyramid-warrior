@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sp-warrior-cache-v2'; // <--- VERSIÓN ACTUALIZADA
+const CACHE_NAME = 'sp-warrior-cache-v3'; // <--- ACTUALIZA A v3
 // Lista de los archivos esenciales para que el juego inicie
 const urlsToCache = [
   '/',
@@ -6,7 +6,6 @@ const urlsToCache = [
   'style.css',
   'game.js',
   'img/player.png'
-  // Para una mejor experiencia offline, puedes agregar más imágenes y sonidos aquí.
 ];
 
 // Instala el Service Worker y guarda los archivos en el caché
