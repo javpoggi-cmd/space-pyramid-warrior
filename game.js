@@ -120,46 +120,88 @@ document.addEventListener('DOMContentLoaded', () => {
     let luckUpOnCooldown = false;
 
     // --- Rutas de Assets (con nuevo dron) ---
-    const assetPaths = { player: 'img/player.png', drone: 'img/drone.png', bullet: 'img/bullet.png', heavyBullet: 'img/heavy_bullet.png', sidekickBullet: 'img/sidekick_bullet.png', missile: 'img/missile.png', enemyBullet: 'img/enemy_bullet.png', explosion1: 'img/explosion1.png', explosion2: 'img/explosion2.png', explosion3: 'img/explosion3.png', shieldEffect1: 'img/shield_effect_1.png', shieldEffect2: 'img/shield_effect_2.png', shieldEffect3: 'img/shield_effect_3.png', enemy1: 'img/enemy1.png', enemy2: 'img/enemy2.png', enemy3: 'img/enemy3.png', enemy4: 'img/enemy4.png', enemy5: 'img/enemy5.png', enemy6: 'img/enemy6.png', enemy7: 'img/enemy7.png', superBoss1: 'img/super_boss_1.png', superBoss2: 'img/super_boss_2.png', superBoss3: 'img/super_boss_3.png', superBoss4: 'img/super_boss_4.png', gigaBoss: 'img/giga_boss.png', finalEnemy: 'img/final_enemy.png', asteroid1: 'img/asteroid1.png', asteroid2: 'img/asteroid2.png', powerupShield: 'img/powerup_shield.png', powerupRapidFire: 'img/powerup_rapidfire.png', powerupExtraLife: 'img/powerup_extralife.png', powerupWings: 'img/powerup_wings.png', powerupHeavy: 'img/powerup_heavy.png', powerupMissile: 'img/powerup_missile.png', powerupSidekick: 'img/powerup_sidekick.png', powerupBomb: 'img/powerup_bomb.png', powerupLuck: 'img/powerup_luck.png', powerupDrone: 'img/powerup_drone.png', missileIcon: 'img/missile_icon.png', introScreen: 'img/intro_screen.png', ending1: 'img/ending_1.png', ending2: 'img/ending_2.png', ending3: 'img/ending_3.png', ending4: 'img/ending_4.png', ending5: 'img/ending_5.png' };
+    const assetPaths = { player: 'img/player.png', drone: 'img/drone.png', droneBullet: 'img/drone_bullet.png', bullet: 'img/bullet.png', heavyBullet: 'img/heavy_bullet.png', sidekickBullet: 'img/sidekick_bullet.png', missile: 'img/missile.png', enemyBullet: 'img/enemy_bullet.png', explosion1: 'img/explosion1.png', explosion2: 'img/explosion2.png', explosion3: 'img/explosion3.png', shieldEffect1: 'img/shield_effect_1.png', shieldEffect2: 'img/shield_effect_2.png', shieldEffect3: 'img/shield_effect_3.png', enemy1: 'img/enemy1.png', enemy2: 'img/enemy2.png', enemy3: 'img/enemy3.png', enemy4: 'img/enemy4.png', enemy5: 'img/enemy5.png', enemy6: 'img/enemy6.png', enemy7: 'img/enemy7.png', superBoss1: 'img/super_boss_1.png', superBoss2: 'img/super_boss_2.png', superBoss3: 'img/super_boss_3.png', superBoss4: 'img/super_boss_4.png', gigaBoss: 'img/giga_boss.png', finalEnemy: 'img/final_enemy.png', asteroid1: 'img/asteroid1.png', asteroid2: 'img/asteroid2.png', powerupShield: 'img/powerup_shield.png', powerupRapidFire: 'img/powerup_rapidfire.png', powerupExtraLife: 'img/powerup_extralife.png', powerupWings: 'img/powerup_wings.png', powerupHeavy: 'img/powerup_heavy.png', powerupMissile: 'img/powerup_missile.png', powerupSidekick: 'img/powerup_sidekick.png', powerupBomb: 'img/powerup_bomb.png', powerupLuck: 'img/powerup_luck.png', powerupDrone: 'img/powerup_drone.png', missileIcon: 'img/missile_icon.png', introScreen: 'img/intro_screen.png', ending1: 'img/ending_1.png', ending2: 'img/ending_2.png', ending3: 'img/ending_3.png', ending4: 'img/ending_4.png', ending5: 'img/ending_5.png' };
     const audioPaths = { backgroundMusic: 'audio/background_music.mp3', bossMusic: 'audio/boss_music.mp3', introMusic: 'audio/intro_music.mp3', endingMusic: 'audio/ending_music.mp3', playerShoot: 'audio/player_shoot.wav', heavyShoot: 'audio/heavy_shoot.wav', missileLaunch: 'audio/missile_launch.wav', missileExplosion: 'audio/missile_explosion.wav', enemyShoot: 'audio/enemy_shoot.wav', explosionSmall: 'audio/explosion_small.wav', explosionLarge: 'audio/explosion_large.wav', bossExplosion: 'audio/boss_explosion.wav', powerupShield: 'audio/powerup_shield.wav', powerupBurst: 'audio/powerup_burst.wav', powerupExtraLife: 'audio/powerup_extralife.wav', powerupWings: 'audio/powerup_wings.wav', powerupHeavy: 'audio/powerup_heavy.wav', powerupMissile: 'audio/powerup_missile.wav', powerupSidekick: 'audio/powerup_sidekick.wav', powerupBombPickup: 'audio/powerup_bomb_pickup.wav', powerupLuck: 'audio/powerup_luck.wav', powerupDrone: 'audio/powerup_drone.wav', bombExplode: 'audio/bomb_explode.wav', hit: 'audio/hit.wav', playerDamaged: 'audio/player_damaged.wav' };
 
-    function preloadAssets() { console.log("Iniciando precarga de imágenes..."); const promises = Object.keys(assetPaths).map(key => { return new Promise((resolve) => { const img = new Image(); const path = assetPaths[key]; img.src = path; img.onload = () => { console.log(`Imagen cargada: ${path}`); assets[key] = img; resolve(); }; img.onerror = () => { console.warn(`¡ERROR! No se pudo cargar la imagen: ${path}. Revisa que el archivo exista.`); resolve(); }; }); }); return Promise.all(promises); }
+    function preloadAssets() {
+    console.log("Iniciando precarga de imágenes...");
+    const promises = Object.keys(assetPaths).map(key => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const path = assetPaths[key];
+            img.src = path;
+            img.onload = () => {
+                console.log(`Imagen cargada: ${path}`);
+                assets[key] = img;
+                resolve();
+            };
+            img.onerror = () => {
+                console.warn(`¡ERROR! No se pudo cargar la imagen: ${path}. Revisa que el archivo exista.`);
+                resolve();
+            };
+        });
+    });
+  
+    return Promise.all(promises).then(() => {
+        
+});
+}
     function preloadAudio() { console.log("Creando objetos de audio..."); for (const key in audioPaths) { const audio = new Audio(); audio.src = audioPaths[key]; audioAssets[key] = audio; } console.log("Objetos de audio creados."); }
     function playMusic(track) { if (audioAssets.backgroundMusic) audioAssets.backgroundMusic.pause(); if (audioAssets.bossMusic) audioAssets.bossMusic.pause(); if(audioAssets.introMusic) audioAssets.introMusic.pause(); if(audioAssets.endingMusic) audioAssets.endingMusic.pause(); if (isMusicOn && track) { track.currentTime = 0; track.loop = true; track.volume = musicVolume; track.play().catch(e => { /* Ignorar errores */ }); } }
     function playSound(sound, volume = 1.0) { if (isSfxOn && sound) { const soundInstance = sound.cloneNode(); soundInstance.volume = sfxVolume * volume; soundInstance.play().catch(e => {/* Ignorar errores */}); } }
+    function createFilteredAsset(sourceKey, targetKey, filter) {
+    const sourceImage = assets[sourceKey];
+    if (!sourceImage) {
+        console.error(`La imagen fuente '${sourceKey}' no existe.`);
+        return;
+    }
 
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+
+    offscreenCanvas.width = sourceImage.width;
+    offscreenCanvas.height = sourceImage.height;
+
+    offscreenCtx.filter = filter; // Aplicamos el filtro UNA SOLA VEZ
+    offscreenCtx.drawImage(sourceImage, 0, 0);
+
+    const filteredImage = new Image();
+    filteredImage.src = offscreenCanvas.toDataURL();
+    assets[targetKey] = filteredImage; // Guardamos la nueva imagen pre-renderizada
+    console.log(`Asset filtrado '${targetKey}' creado.`);
+}
     // --- Clases del Juego ---
     class Player { constructor() { this.image = assets.player; this.width = GAME_CONFIG.player.width * scaleFactor; this.height = GAME_CONFIG.player.height * scaleFactor; this.x = canvas.width / 2 - this.width / 2; this.y = canvas.height + this.height; this.speed = GAME_CONFIG.player.speed * scaleFactor; this.isPositioned = false; } draw() { if (this.image) { if (isInvulnerable && !shieldStacks) { ctx.globalAlpha = (Math.floor(Date.now() / 100) % 2 === 0) ? 0.5 : 1; } ctx.drawImage(this.image, this.x, this.y, this.width, this.height); ctx.globalAlpha = 1; if (shieldStacks > 0 && assets[`shieldEffect${shieldStacks}`]) { const shieldImage = assets[`shieldEffect${shieldStacks}`]; const shieldOffset = 20 * scaleFactor; ctx.drawImage(shieldImage, this.x - shieldOffset, this.y - shieldOffset, this.width + shieldOffset * 2, this.height + shieldOffset * 2); } } } update() { if (!this.isPositioned) { const targetY = canvas.height - 150 * scaleFactor; if (this.y > targetY) { this.y -= 2 * scaleFactor; } else { this.y = targetY; this.isPositioned = true; } return; } let moveX = 0; let moveY = 0; if (keys['arrowleft'] || keys['a']) moveX -= 1; if (keys['arrowright'] || keys['d']) moveX += 1; if (keys['arrowup'] || keys['w']) moveY -= 1; if (keys['arrowdown'] || keys['s']) moveY += 1; const gamepad = navigator.getGamepads()[0]; if (gamepad) { const stickX = gamepad.axes[0]; const stickY = gamepad.axes[1]; const deadzone = 0.2; if (Math.abs(stickX) > deadzone) moveX = stickX; if (Math.abs(stickY) > deadzone) moveY = stickY; if (gamepad.buttons[0].pressed) { this.shoot(); } } if (touchMoveX) moveX = touchMoveX; if (touchMoveY) moveY = touchMoveY; if (moveX !== 0) this.x += this.speed * moveX; if (moveY !== 0) this.y += this.speed * moveY; if (this.x < 0) this.x = 0; if (this.x > canvas.width - this.width) this.x = canvas.width - this.width; if (this.y < 0) this.y = 0; if (this.y > canvas.height - this.height) this.y = canvas.height - this.height; } shoot() { const now = Date.now(); const currentCooldown = (heavyCannonLevel > 0) ? GAME_CONFIG.player.heavyCannonCooldown : GAME_CONFIG.player.shootCooldown; if (!this.isPositioned || now - playerLastShotTime < currentCooldown) return; if (homingSidekickActive) { const target = findNearestTarget(this.x, this.y, ['enemies', 'bosses']); if (target) { bullets.push(new SidekickBullet(this.x + this.width / 2 - (5 * scaleFactor), this.y, target)); } } if (heavyCannonLevel > 0) { playSound(audioAssets.heavyShoot, 0.8); const shots = heavyCannonLevel; for (let i = 0; i < shots; i++) { setTimeout(() => { if (gameRunning) bullets.push(new HeavyBullet(this.x + this.width / 2 - (15 * scaleFactor), this.y)); }, i * 120); } } else { playSound(audioAssets.playerShoot, 0.7); let shotsPerBurst = 1; if (burstFireLevel === 1) shotsPerBurst = 2; if (burstFireLevel === 2) shotsPerBurst = 3; const fire = (xOffset) => { for (let i = 0; i < shotsPerBurst; i++) { setTimeout(() => { if (gameRunning) bullets.push(new Bullet(this.x + xOffset, this.y)); }, i * 100); } }; if (wingCannonsActive) { fire(this.width * 0.2); fire(this.width * 0.8 - (10 * scaleFactor)); } else { fire(this.width / 2 - (5 * scaleFactor)); } } playerLastShotTime = now; } }
     class Bullet { constructor(x, y) { this.image = assets.bullet; this.x = x; this.y = y; this.width = 10 * scaleFactor; this.height = 30 * scaleFactor; this.speed = 12 * scaleFactor; this.damage = 1; } draw() { if (this.image) ctx.drawImage(this.image, this.x, this.y, this.width, this.height); } update() { this.y -= this.speed; } }
     
     class DroneBullet {
-        constructor(x, y, target) {
-            this.image = assets.sidekickBullet;
-            this.x = x;
-            this.y = y;
-            this.target = target;
-            this.width = 15 * scaleFactor;
-            this.height = 15 * scaleFactor;
-            this.speed = GAME_CONFIG.drones.bulletSpeed * scaleFactor;
-            this.damage = 0.6;
-        }
-        draw() {
-            if (this.image) {
-                ctx.filter = 'hue-rotate(280deg) brightness(1.2)';
-                ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-                ctx.filter = 'none';
-            }
-        }
-        update() {
-            if (this.target && this.target.health > 0) {
-                const angle = Math.atan2(this.target.y - this.y, this.target.x - this.x);
-                this.x += Math.cos(angle) * this.speed;
-                this.y += Math.sin(angle) * this.speed;
-            } else {
-                this.y -= this.speed;
-            }
+    constructor(x, y, angle) {
+        this.image = assets.droneBullet; 
+        this.x = x;
+        this.y = y;
+        this.width = 20 * scaleFactor;
+        this.height = 20 * scaleFactor;
+        this.damage = 0.6;
+        
+        const speed = GAME_CONFIG.drones.bulletSpeed * scaleFactor;
+        this.speedX = Math.cos(angle) * speed;
+        this.speedY = Math.sin(angle) * speed;
+    }
+    
+    draw() {
+        // El método draw ahora es súper simple y rápido. ¡Sin filtros!
+        if (this.image) {
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
     }
+    
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+    }
+}
+        
+    
 
     class Drone {
         constructor(player, angleOffset) {
@@ -188,7 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const now = Date.now();
             if (this.target && now - this.lastShotTime > GAME_CONFIG.drones.shootCooldown) {
-                bullets.push(new DroneBullet(this.x + this.width / 2, this.y + this.height / 2, this.target));
+                 const angleToTarget = Math.atan2(
+            (this.target.y + this.target.height / 2) - (this.y + this.height / 2),
+            (this.target.x + this.target.width / 2) - (this.x + this.width / 2)
+        );
+                bullets.push(new DroneBullet(this.x + this.width / 2, this.y + this.height / 2, angleToTarget));
                 this.lastShotTime = now;
             }
         }
@@ -272,7 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
             enemyBullets.push(new EnemyBullet(bulletX, bulletY));
             break;
     }
-} }
+}
+} 
     class Boss { constructor(bossType) { this.bossType = bossType; const bossConfigs = { 'SUPER_BOSS_1': { img: assets.superBoss1, size: 6, health: 250, attacks: ['homingBarrage', 'sweepingWall'] }, 'SUPER_BOSS_2': { img: assets.superBoss2, size: 6, health: 300, attacks: ['mineLayer', 'crossfire'] }, 'SUPER_BOSS_3': { img: assets.superBoss3, size: 6, health: 350, attacks: ['spiral', 'burstSnipe'] }, 'SUPER_BOSS_4': { img: assets.superBoss4, size: 6, health: 450, attacks: ['cone', 'summon'] }, 'GIGA_BOSS':    { img: assets.gigaBoss,   size: 10, health: 900, attacks: ['homingBarrage', 'sweepingWall', 'mineLayer', 'crossfire', 'spiral', 'burstSnipe', 'cone', 'summon'] }, 'FINAL_ENEMY':  { img: assets.finalEnemy, size: 1.5, health: 100, attacks: ['finalBurst', 'spiral'] }, 'REGULAR':      { img: assets[`enemy${bossType}`], size: 4, health: 100, attacks: ['radial', 'circular'] } }; const config = bossConfigs[bossType] || bossConfigs['REGULAR']; this.image = config.img; const playerBaseWidth = GAME_CONFIG.player.width * scaleFactor; if (this.bossType === 'GIGA_BOSS') { this.width = 1000 * scaleFactor; this.height = 500 * scaleFactor; } else { this.width = playerBaseWidth * config.size; this.height = playerBaseWidth * config.size; } this.health = config.health; this.maxHealth = this.health; this.attackPatterns = config.attacks; this.x = canvas.width / 2 - this.width / 2; this.y = 0 - this.height; this.speed = 1 * scaleFactor; this.isPositioned = false; this.attackPhaseIndex = 0; this.attackPhase = this.attackPatterns[0]; this.lastAttackSwitch = Date.now(); this.lastShotTime = 0; this.circularShotIndex = 0; this.movementAngle = -Math.PI / 2; this.sweepAngle = -Math.PI / 4; this.sweepDirection = 1; if (this.bossType === 'FINAL_ENEMY') { this.speed = GAME_CONFIG.player.speed * scaleFactor * 1.5; this.moveTimer = 0; this.targetX = Math.random() * (canvas.width - this.width); this.targetY = Math.random() * (canvas.height - this.height); } } draw() { if (this.image) { ctx.drawImage(this.image, this.x, this.y, this.width, this.height); } if (this.isPositioned && this.bossType !== 'FINAL_ENEMY') { const barWidth = canvas.width / 2; const barHeight = 25 * scaleFactor; const barY = 30 * scaleFactor; const healthPercentage = this.health / this.maxHealth; ctx.fillStyle = '#440000'; ctx.fillRect(canvas.width / 2 - barWidth / 2, barY, barWidth, barHeight); ctx.fillStyle = '#00ff00'; ctx.fillRect(canvas.width / 2 - barWidth / 2, barY, barWidth * healthPercentage, barHeight); ctx.strokeStyle = 'white'; ctx.strokeRect(canvas.width / 2 - barWidth / 2, barY, barWidth, barHeight); } } update() { if (this.bossType === 'FINAL_ENEMY') { if (!this.isPositioned) { if (this.y < canvas.height / 2) { this.y += this.speed; } else { this.isPositioned = true; } } this.moveTimer -= 16; if (this.moveTimer <= 0) { if (Math.random() < 0.3) { this.targetX = player.x > canvas.width / 2 ? Math.random() * (canvas.width / 4) : canvas.width * 0.75 + Math.random() * (canvas.width / 4); this.targetY = player.y > canvas.height / 2 ? Math.random() * (canvas.height / 4) : canvas.height * 0.75 + Math.random() * (canvas.height / 4); } else { this.targetX = Math.random() * (canvas.width - this.width); this.targetY = Math.random() * (canvas.height * 0.8); } this.moveTimer = Math.random() * 1000 + 500; } const angle = Math.atan2(this.targetY - this.y, this.targetX - this.x); this.x += Math.cos(angle) * this.speed; this.y += Math.sin(angle) * this.speed; } else { if (!this.isPositioned) { if (this.y < (50 * scaleFactor)) { this.y += this.speed; } else { this.isPositioned = true; } return; } this.movementAngle += 0.01; const moveRange = (this.bossType === 'GIGA_BOSS') ? (200 * scaleFactor) : (100 * scaleFactor); this.x = (canvas.width / 2 - this.width / 2) + Math.cos(this.movementAngle) * moveRange; if (this.bossType === 'GIGA_BOSS') { this.y = (50 * scaleFactor) + Math.sin(this.movementAngle * 0.7) * (40 * scaleFactor); } } if (Date.now() - this.lastAttackSwitch > 10000) { this.attackPhaseIndex = (this.attackPhaseIndex + 1) % this.attackPatterns.length; this.attackPhase = this.attackPatterns[this.attackPhaseIndex]; this.lastAttackSwitch = Date.now(); this.circularShotIndex = 0; } this.shoot(); } shoot() { switch(this.attackPhase) { case 'radial': if (Date.now() - this.lastShotTime > 4000) { this.lastShotTime = Date.now(); setTimeout(() => this.fireRadialBurst(), 0); setTimeout(() => this.fireRadialBurst(), 500); } break; case 'circular': if (Date.now() - this.lastShotTime > 150) { this.lastShotTime = Date.now(); this.fireCircularShot(); } break; case 'homingBarrage': if (Date.now() - this.lastShotTime > 2000) { this.lastShotTime = Date.now(); this.firePredictiveBurst(); } break; case 'sweepingWall': if (Date.now() - this.lastShotTime > 50) { this.lastShotTime = Date.now(); this.fireSweepingWall(); } break; case 'mineLayer': if (Date.now() - this.lastShotTime > 1000) { this.lastShotTime = Date.now(); this.fireMine(); } break; case 'crossfire': if (Date.now() - this.lastShotTime > 200) { this.lastShotTime = Date.now(); this.fireCrossfire(); } break; case 'spiral': if (Date.now() - this.lastShotTime > 40) { this.lastShotTime = Date.now(); this.fireSpiral(); } break; case 'burstSnipe': if (Date.now() - this.lastShotTime > 2000) { this.lastShotTime = Date.now(); this.fireBurstSnipe(); } break; case 'cone': if (Date.now() - this.lastShotTime > 1500) { this.lastShotTime = Date.now(); this.fireCone(); } break; case 'summon': if (Date.now() - this.lastShotTime > 8000) { this.lastShotTime = Date.now(); this.summonEnemies(); } break; case 'finalBurst': if (Date.now() - this.lastShotTime > 1500) { this.lastShotTime = Date.now(); this.fireFinalBurst(); } break; } } fireRadialBurst() { playSound(audioAssets.enemyShoot, 0.6); const bulletSpeed = 5; const wingLeftX = this.x + this.width * 0.1; const wingRightX = this.x + this.width * 0.9; const wingY = this.y + this.height * 0.7; for (let i = 0; i < 8; i++) { const angle = (i / 8) * Math.PI * 2; const speedX = Math.cos(angle) * bulletSpeed; const speedY = Math.sin(angle) * bulletSpeed; enemyBullets.push(new EnemyBullet(wingLeftX, wingY, speedX, speedY)); enemyBullets.push(new EnemyBullet(wingRightX, wingY, speedX, speedY)); } } fireCircularShot() { playSound(audioAssets.enemyShoot, 0.3); const bulletSpeed = 6; const baseAngle = Math.atan2(0, -Math.sin(this.movementAngle)); const angle = baseAngle + (this.circularShotIndex / 15) * Math.PI * 2; const speedX = Math.cos(angle) * bulletSpeed; const speedY = Math.sin(angle) * bulletSpeed; enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height * 0.8, speedX, speedY)); this.circularShotIndex++; if (this.circularShotIndex >= 15) { this.circularShotIndex = 0; this.lastShotTime = Date.now() + 2000; } } firePredictiveBurst() { playSound(audioAssets.enemyShoot, 0.7); const bulletSpeed = 8; const centerX = this.x + this.width / 2; const centerY = this.y + this.height * 0.8; const angleToPlayer = Math.atan2(player.y - centerY, player.x - centerX); for(let i = -1; i <= 1; i++){ const angle = angleToPlayer + i * 0.2; enemyBullets.push(new EnemyBullet(centerX, centerY, Math.cos(angle) * bulletSpeed, Math.sin(angle) * bulletSpeed)); } } fireSweepingWall() { playSound(audioAssets.enemyShoot, 0.2); const bulletSpeed = 7; const baseAngle = Math.PI / 2; const angle = baseAngle + this.sweepAngle; const speedX = Math.cos(angle) * bulletSpeed; const speedY = Math.sin(angle) * bulletSpeed; enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height * 0.8, speedX, speedY)); this.sweepAngle += 0.05 * this.sweepDirection; if (this.sweepAngle > Math.PI / 4 || this.sweepAngle < -Math.PI / 4) { this.sweepDirection *= -1; } } fireMine() { playSound(audioAssets.enemyShoot, 0.5); const mineX = this.x + Math.random() * this.width; enemyBullets.push(new MineBullet(mineX, this.y + this.height * 0.7)); } fireCrossfire() { playSound(audioAssets.enemyShoot, 0.2); const bulletSpeed = 8; const angleToPlayerL = Math.atan2(player.y - (this.y + this.height * 0.6), player.x - (this.x + this.width * 0.2)); const angleToPlayerR = Math.atan2(player.y - (this.y + this.height * 0.6), player.x - (this.x + this.width * 0.8)); enemyBullets.push(new EnemyBullet(this.x + this.width * 0.2, this.y + this.height * 0.6, Math.cos(angleToPlayerL) * bulletSpeed, Math.sin(angleToPlayerL) * bulletSpeed)); enemyBullets.push(new EnemyBullet(this.x + this.width * 0.8, this.y + this.height * 0.6, Math.cos(angleToPlayerR) * bulletSpeed, Math.sin(angleToPlayerR) * bulletSpeed)); } fireSpiral() { playSound(audioAssets.enemyShoot, 0.1); const bulletSpeed = 5; for(let j = 0; j < 2; j++){ const angle = this.circularShotIndex * 0.2 + j * Math.PI; const speedX = Math.cos(angle) * bulletSpeed; const speedY = Math.sin(angle) * bulletSpeed; enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height / 2, speedX, speedY)); } const increment = this.bossType === 'FINAL_ENEMY' ? 2 : 1; this.circularShotIndex += increment; } fireBurstSnipe() { playSound(audioAssets.enemyShoot, 0.7); const bulletSpeed = 10; const angleToPlayer = Math.atan2(player.y - (this.y + this.height / 2), player.x - (this.x + this.width / 2)); for(let i = 0; i < 3; i++){ setTimeout(() => { enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height / 2, Math.cos(angleToPlayer) * bulletSpeed, Math.sin(angleToPlayer) * bulletSpeed)); }, i * 100); } } fireCone() { playSound(audioAssets.enemyShoot, 0.8); const bulletSpeed = 6; const angleToPlayer = Math.atan2(player.y - (this.y + this.height * 0.8), player.x - (this.x + this.width / 2)); for(let i = -2; i <= 2; i++){ const angle = angleToPlayer + i * 0.15; enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height * 0.8, Math.cos(angle) * bulletSpeed, Math.sin(angle) * bulletSpeed)); } } summonEnemies() { playSound(audioAssets.powerupBurst); for(let i = 0; i < 2; i++){ const randomType = Math.floor(Math.random() * 5) + 1; if(gameRunning) enemies.push(new Enemy(randomType)); } } fireFinalBurst() { playSound(audioAssets.enemyShoot, 0.6); const bulletSpeed = 9; const angleToPlayer = Math.atan2(player.y - (this.y + this.height / 2), player.x - (this.x + this.width / 2)); for(let i = 0; i < 6; i++){ setTimeout(() => { if (gameRunning) enemyBullets.push(new EnemyBullet(this.x + this.width / 2, this.y + this.height / 2, Math.cos(angleToPlayer) * bulletSpeed, Math.sin(angleToPlayer) * bulletSpeed)); }, i * 80); } } }
     
     // --- Lógica del Juego y Funciones Principales ---
@@ -596,7 +643,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (rand < 0.42) type = 'extraLife';
                 else if (rand < 0.54) type = 'wingCannons';
                 else if (rand < 0.66) type = 'heavyCannon';
-                else type = 'missileSystem';
+                //else if (rand < 0.78) type = 'missileSystem';
+                else if (rand < 0.89) type = 'drone'; 
+                //else type = 'sidekick';      
                 powerUps.push(new PowerUp(target.x, target.y, type));
             }
 
