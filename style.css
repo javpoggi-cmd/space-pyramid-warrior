@@ -77,7 +77,7 @@ canvas {
 #joystick {
     position: fixed;
     bottom: 2vh; /* Más cerca del borde inferior */
-    left: 2vw;   /* Más cerca del borde izquierdo */
+    left: 1vw;   /* Más cerca del borde izquierdo */
     width: 25vw; 
     height: 25vw;
     max-width: 150px; 
@@ -101,6 +101,7 @@ canvas {
 .touch-button {
     position: fixed;
     bottom: 1vh; /* Más cerca del borde inferior */
+    right: 1vh;
     width: 18vw;
     height: 18vw;
     max-width: 100px;
@@ -131,6 +132,7 @@ canvas {
     transform: scale(0.95);
     background-color: rgba(255, 255, 255, 0.5);
 }
+
 
 
 
