@@ -100,8 +100,7 @@ canvas {
 
 .touch-button {
     position: fixed;
-    left: 1vh;
-    bottom: 2vh; /* Más cerca del borde inferior */
+    bottom: 1vh; /* Más cerca del borde inferior */
     width: 18vw;
     height: 18vw;
     max-width: 100px;
@@ -132,5 +131,6 @@ canvas {
     transform: scale(0.95);
     background-color: rgba(255, 255, 255, 0.5);
 }
+
 
 
