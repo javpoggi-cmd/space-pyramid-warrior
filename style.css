@@ -100,6 +100,7 @@ canvas {
 
 .touch-button {
     position: fixed;
+    left: 1vh;
     bottom: 2vh; /* Más cerca del borde inferior */
     width: 18vw;
     height: 18vw;
@@ -112,13 +113,13 @@ canvas {
 }
 
 #actionButton {
-    right: 2vw; /* Más cerca del borde derecho */
+    right: 1vw; /* Más cerca del borde derecho */
 }
 
 #missileButton {
     /* Posicionado arriba del botón de acción y alineado al mismo borde lateral */
-    right: 2vw; 
-    bottom: calc(2vh + 12vw + 2vh); /* (bottom de action) + (altura de action) + (espacio) */
+    right: 1vw; 
+    bottom: calc(2vh + 10vw + 2vh); /* (bottom de action) + (altura de action) + (espacio) */
     width: 14vw; 
     height: 14vw;
     max-width: 80px;
@@ -131,4 +132,5 @@ canvas {
     transform: scale(0.95);
     background-color: rgba(255, 255, 255, 0.5);
 }
+
 
