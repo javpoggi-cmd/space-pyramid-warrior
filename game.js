@@ -704,7 +704,14 @@ document.addEventListener('DOMContentLoaded', () => {
 }, 500); setTimeout(() => {
         endingState = { currentImage: 1, alpha: 0, phase: 'fade-in', timer: Date.now() };
         requestAnimationFrame(endingLoop);
-    }, 5000); } function endingLoop() { if (gameState !== 'ENDING' && gameState !== 'POST_ENDING') return; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); stars.forEach(s => { s.update(0,0); s.draw(); }); explosions.forEach((ex, i) => { ex.update(); if (ex.life <= 0) explosions.splice(i, 1); else ex.draw(); }); const img = assets[`ending${endingState.currentImage}`]; if (img && gameState === 'ENDING') { const elapsedTime = Date.now() - endingState.timer; if (endingState.phase === 'fade-in') { endingState.alpha = Math.min(1, elapsedTime / 3000); if (endingState.alpha >= 1) { endingState.phase = 'hold'; endingState.timer = Date.now(); } } else if (endingState.phase === 'fade-out') {
+    }, 5000); } function endingLoop() { if (gameState !== 'ENDING' && gameState !== 'POST_ENDING') return; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); stars.forEach(s => { s.update(0,0); s.draw(); }); explosions.forEach((ex, i) => { ex.update(); if (ex.life <= 0) explosions.splice(i, 1); else ex.draw(); }); const img = assets[`ending${endingState.currentImage}`]; if (img && gameState === 'ENDING') { const elapsedTime = Date.now() - endingState.timer; if (endingState.phase === 'fade-in') { endingState.alpha = Math.min(1, elapsedTime / 3000); if (endingState.alpha >= 1) { endingState.phase = 'hold'; endingState.timer = Date.now(); } } else if (endingState.phase === 'hold') {
+    // Mantenemos la imagen visible por 4 segundos (4000ms)
+    if (elapsedTime > 4000) { 
+        endingState.phase = 'fade-out';
+        endingState.timer = Date.now();
+    }
+} 
+    else if (endingState.phase === 'fade-out') {
     endingState.alpha = Math.max(0, 1 - (elapsedTime / 3000));
     if (endingState.alpha <= 0) {
         endingState.currentImage++;
@@ -821,3 +828,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initButton.onclick = initIntro;
 });
+
