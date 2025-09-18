@@ -118,7 +118,7 @@ canvas {
 #missileButton {
     /* Posicionado arriba del botón de acción y alineado al mismo borde lateral */
     right: 2vw; 
-    bottom: calc(2vh + 18vw + 2vh); /* (bottom de action) + (altura de action) + (espacio) */
+    bottom: calc(2vh + 12vw + 2vh); /* (bottom de action) + (altura de action) + (espacio) */
     width: 14vw; 
     height: 14vw;
     max-width: 80px;
@@ -131,3 +131,4 @@ canvas {
     transform: scale(0.95);
     background-color: rgba(255, 255, 255, 0.5);
 }
+
