@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             height: 100,
             initialLives: 3,
             maxLives: 6,
-            initialHealth: 1000,
+            initialHealth: 3,
             maxHealth: 3,
             invulnerabilityDuration: 2000,
-            shootCooldown: 150,
+            shootCooldown: 350,
             heavyCannonCooldown: 800,
             heavyCannonDuration: 15000,
         },
@@ -828,4 +828,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initButton.onclick = initIntro;
 });
+
 
