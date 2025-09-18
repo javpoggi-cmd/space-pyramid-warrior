@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             height: 100,
             initialLives: 3,
             maxLives: 6,
-            initialHealth: 3,
+            initialHealth: 1000,
             maxHealth: 3,
             invulnerabilityDuration: 2000,
-            shootCooldown: 350,
+            shootCooldown: 150,
             heavyCannonCooldown: 800,
             heavyCannonDuration: 15000,
         },
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
         endingState.timer = Date.now();
     }
 } 
-    else if (endingState.phase === 'fade-out') {
+ else if (endingState.phase === 'fade-out') {
     endingState.alpha = Math.max(0, 1 - (elapsedTime / 3000));
     if (endingState.alpha <= 0) {
         endingState.currentImage++;
@@ -828,5 +828,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initButton.onclick = initIntro;
 });
-
-
