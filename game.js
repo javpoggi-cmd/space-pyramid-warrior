@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             height: 100,
             initialLives: 3,
             maxLives: 6,
-            initialHealth: 3,
+            initialHealth: 1000,
             maxHealth: 3,
             invulnerabilityDuration: 2000,
-            shootCooldown: 350,
+            shootCooldown: 150,
             heavyCannonCooldown: 800,
             heavyCannonDuration: 15000,
         },
@@ -704,7 +704,28 @@ document.addEventListener('DOMContentLoaded', () => {
 }, 500); setTimeout(() => {
         endingState = { currentImage: 1, alpha: 0, phase: 'fade-in', timer: Date.now() };
         requestAnimationFrame(endingLoop);
-    }, 5000); } function endingLoop() { if (gameState !== 'ENDING' && gameState !== 'POST_ENDING') return; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); stars.forEach(s => { s.update(0,0); s.draw(); }); explosions.forEach((ex, i) => { ex.update(); if (ex.life <= 0) explosions.splice(i, 1); else ex.draw(); }); const img = assets[`ending${endingState.currentImage}`]; if (img && gameState === 'ENDING') { const elapsedTime = Date.now() - endingState.timer; if (endingState.phase === 'fade-in') { endingState.alpha = Math.min(1, elapsedTime / 3000); if (endingState.alpha >= 1) { endingState.phase = 'hold'; endingState.timer = Date.now(); } } else if (endingState.phase === 'hold') { if (elapsedTime > 4000) { endingState.phase = 'fade-out'; endingState.timer = Date.now(); } } else if (endingState.phase === 'fade-out') { endingState.alpha = Math.max(0, 1 - (elapsedTime / 3000)); if (endingState.alpha <= 0) { endingState.currentImage++; if (assets[`ending${endingState.currentImage}`]) { endingState.phase = 'fade-in'; endingState.timer = Date.now(); } else { gameState = 'POST_ENDING'; for (let i = 0; i < 15; i++) { setTimeout(() => { const exX = Math.random() * canvas.width; const exY = Math.random() * canvas.height; explosions.push(new Explosion(exX, exY, Math.random() * 200 + 100)); }, i * 100); } setTimeout(showVictoryScreen, 3000); return; } } } ctx.globalAlpha = endingState.alpha; const scale = Math.min(canvas.width / img.width, canvas.height / img.height); const w = img.width * scale; const h = img.height * scale; ctx.drawImage(img, canvas.width/2 - w/2, canvas.height/2 - h/2, w, h); const titleIndex = endingState.currentImage - 1; if (endingTitles[titleIndex]) { const title = endingTitles[titleIndex]; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; const fontSize = (titleIndex === 0) ? Math.max(24, Math.floor(canvas.width / 45)) : Math.max(32, Math.floor(canvas.width / 40)); ctx.font = `bold ${fontSize}px Arial`; ctx.shadowColor = 'black'; ctx.shadowBlur = 10; ctx.fillText(title, canvas.width / 2, canvas.height * 0.85); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; } ctx.globalAlpha = 1; } requestAnimationFrame(endingLoop); } function showVictoryScreen() { const victoryDiv = document.createElement('div'); victoryDiv.id = 'victoryScreen'; Object.assign(victoryDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 20, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100', border: '2px solid #00ff00' }); victoryDiv.innerHTML = ` <h1 style="color: #00ff00; font-size: 3.5em; text-shadow: 2px 2px 8px #0f0;">¡VICTORIA!</h1> <p style="font-size: 1.8em;">Has derrotado a los insectoides de la 9ª Dimensión.</p> <p style="font-size: 1.5em;">Puntaje Final: ${score}</p> <button id="restartButton">Volver al Menú</button> `; gameContainer.appendChild(victoryDiv); const restartButton = document.getElementById('restartButton'); Object.assign(restartButton.style, { padding: '15px 30px', fontSize: '1.5em', cursor: 'pointer', backgroundColor: '#00ff00', color: '#000', border: 'none', borderRadius: '5px', marginTop: '20px' }); restartButton.onclick = () => { gameContainer.removeChild(victoryDiv); lobby.style.display = 'block'; canvas.style.display = 'none'; updateLobbyUI(); }; }
+    }, 5000); } function endingLoop() { if (gameState !== 'ENDING' && gameState !== 'POST_ENDING') return; ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); stars.forEach(s => { s.update(0,0); s.draw(); }); explosions.forEach((ex, i) => { ex.update(); if (ex.life <= 0) explosions.splice(i, 1); else ex.draw(); }); const img = assets[`ending${endingState.currentImage}`]; if (img && gameState === 'ENDING') { const elapsedTime = Date.now() - endingState.timer; if (endingState.phase === 'fade-in') { endingState.alpha = Math.min(1, elapsedTime / 3000); if (endingState.alpha >= 1) { endingState.phase = 'hold'; endingState.timer = Date.now(); } } else if (endingState.phase === 'fade-out') {
+    endingState.alpha = Math.max(0, 1 - (elapsedTime / 3000));
+    if (endingState.alpha <= 0) {
+        endingState.currentImage++;
+        if (assets[`ending${endingState.currentImage}`]) {
+            endingState.phase = 'fade-in';
+            endingState.timer = Date.now();
+        } else {
+            // Ahora, sin el 'return', el loop continuará.
+            gameState = 'POST_ENDING'; 
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const exX = Math.random() * canvas.width;
+                    const exY = Math.random() * canvas.height;
+                    explosions.push(new Explosion(exX, exY, Math.random() * 200 + 100));
+                }, i * 100);
+            }
+            setTimeout(showVictoryScreen, 3000);
+            
+        }
+    }
+} ctx.globalAlpha = endingState.alpha; const scale = Math.min(canvas.width / img.width, canvas.height / img.height); const w = img.width * scale; const h = img.height * scale; ctx.drawImage(img, canvas.width/2 - w/2, canvas.height/2 - h/2, w, h); const titleIndex = endingState.currentImage - 1; if (endingTitles[titleIndex]) { const title = endingTitles[titleIndex]; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; const fontSize = (titleIndex === 0) ? Math.max(24, Math.floor(canvas.width / 45)) : Math.max(32, Math.floor(canvas.width / 40)); ctx.font = `bold ${fontSize}px Arial`; ctx.shadowColor = 'black'; ctx.shadowBlur = 10; ctx.fillText(title, canvas.width / 2, canvas.height * 0.85); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; } ctx.globalAlpha = 1; } requestAnimationFrame(endingLoop); } function showVictoryScreen() { const victoryDiv = document.createElement('div'); victoryDiv.id = 'victoryScreen'; Object.assign(victoryDiv.style, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: '#fff', backgroundColor: 'rgba(0, 20, 0, 0.8)', padding: '40px', borderRadius: '10px', zIndex: '100', border: '2px solid #00ff00' }); victoryDiv.innerHTML = ` <h1 style="color: #00ff00; font-size: 3.5em; text-shadow: 2px 2px 8px #0f0;">¡VICTORIA!</h1> <p style="font-size: 1.8em;">Has derrotado a los insectoides de la 9ª Dimensión.</p> <p style="font-size: 1.5em;">Puntaje Final: ${score}</p> <button id="restartButton">Volver al Menú</button> `; gameContainer.appendChild(victoryDiv); const restartButton = document.getElementById('restartButton'); Object.assign(restartButton.style, { padding: '15px 30px', fontSize: '1.5em', cursor: 'pointer', backgroundColor: '#00ff00', color: '#000', border: 'none', borderRadius: '5px', marginTop: '20px' }); restartButton.onclick = () => { gameContainer.removeChild(victoryDiv); lobby.style.display = 'block'; canvas.style.display = 'none'; updateLobbyUI(); }; }
     
     // --- Lógica de Inicio y Menús ---
     async function startGame(startProgressionIndex = 0) { lobby.innerHTML = '<h1>Cargando...</h1>'; try { await preloadAssets(); lobby.style.display = 'none'; canvas.style.display = 'block'; if (isTouchDevice()) setupTouchControls(); initGame(startProgressionIndex); } catch (error) { lobby.innerHTML = `<h1>Error al cargar imágenes</h1><p>${error}</p>`; console.error("Error durante la precarga de assets:", error); } }
@@ -800,4 +821,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initButton.onclick = initIntro;
 });
-
