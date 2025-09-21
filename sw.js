@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sp-warrior-cache-v4'; // <--- ACTUALIZA A v4
+const CACHE_NAME = 'sp-warrior-cache-v3'; // <--- ACTUALIZA A v3
 // Lista de los archivos esenciales para que el juego inicie
 const urlsToCache = [
   '/',
