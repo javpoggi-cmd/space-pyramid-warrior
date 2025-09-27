@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SP Warrior</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
     
     <link rel="manifest" href="manifest.json">
@@ -11,16 +16,21 @@
     <link rel="apple-touch-icon" href="img/player.png">
 </head>
 <body>
+    <div id="rotate-device-overlay">
+        <p>Por favor, gira tu dispositivo a modo horizontal para jugar.</p>
+    </div>
+
     <div id="startScreen">
         <h1>Space Pyramid Warrior Vs the Insectoids From 9th Dimension</h1>
         <button id="initButton">¡Hacer Clic para Empezar!</button>
     </div>
 
     <div id="lobby" style="display: none;">
-        <h1>SP Warrior</h1>
-        <button id="startButton">¡Comenzar Juego!</button>
+        </div>
+
+    <div id="gameContainer" style="display: none;">
+         <canvas id="gameCanvas"></canvas>
     </div>
-    <canvas id="gameCanvas" style="display: none;"></canvas>
 
     <script src="game.js"></script>
 
@@ -38,5 +48,4 @@
         }
     </script>
 </body>
-
 </html>
