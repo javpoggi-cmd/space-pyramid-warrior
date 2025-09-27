@@ -2303,7 +2303,16 @@ function showVictoryScreen() {
     Object.assign(restartButton.style, { padding: '15px 30px', fontSize: '1.5em', cursor: 'pointer', backgroundColor: '#00ff00', color: '#000', border: 'none', borderRadius: '5px', marginTop: '20px' });
      restartButton.onclick = () => { gameContainer.removeChild(victoryDiv); lobby.style.display = 'flex'; canvas.style.display = 'none'; updateLobbyUI(); };
 }
-    async function startGame(startProgressionIndex = 0) { lobby.innerHTML = '<h1>Cargando...</h1>'; try { await preloadAssets(); lobby.style.display = 'none'; canvas.style.display = 'flex'; initGame(startProgressionIndex); } catch (error) { lobby.innerHTML = `<h1>Error al cargar imágenes</h1><p>${error}</p>`; console.error("Error durante la precarga de assets:", error); } }
+    async function startGame(startProgressionIndex = 0) {
+        try {
+            // Solo intentamos bloquear en dispositivos táctiles
+            if (isTouchDevice() && screen.orientation && typeof screen.orientation.lock === 'function') {
+                await screen.orientation.lock('landscape');
+            }
+        } catch (err) {
+            console.warn("No se pudo bloquear la orientación a landscape:", err);
+        }
+        lobby.innerHTML = '<h1>Cargando...</h1>'; try { await preloadAssets(); lobby.style.display = 'none'; canvas.style.display = 'flex'; initGame(startProgressionIndex); } catch (error) { lobby.innerHTML = `<h1>Error al cargar imágenes</h1><p>${error}</p>`; console.error("Error durante la precarga de assets:", error); } }
     function updateLobbyUI() {
         lobby.style.fontFamily = "'VT323', monospace";
         playMusic(audioAssets.introMusic);
@@ -2406,5 +2415,6 @@ function launchMissile(player) { // <--- AHORA RECIBE EL JUGADOR
     function setupTouchControls() { const joystick = document.createElement('div'); joystick.id = 'joystick'; const stick = document.createElement('div'); stick.id = 'stick'; joystick.appendChild(stick); gameContainer.appendChild(joystick); const actionButton = document.createElement('div'); actionButton.id = 'actionButton'; actionButton.className = 'touch-button'; gameContainer.appendChild(actionButton); const missileButton = document.createElement('div'); missileButton.id = 'missileButton'; missileButton.className = 'touch-button'; gameContainer.appendChild(missileButton); let joystickActive = false; let joystickStartX, joystickStartY; joystick.addEventListener('touchstart', (e) => { e.preventDefault(); joystickActive = true; const touch = e.changedTouches[0]; joystickStartX = touch.clientX; joystickStartY = touch.clientY; }, { passive: false }); joystick.addEventListener('touchmove', (e) => { e.preventDefault(); if (!joystickActive) return; const touch = e.changedTouches[0]; const deltaX = touch.clientX - joystickStartX; const deltaY = touch.clientY - joystickStartY; const maxDistance = joystick.offsetWidth / 3; const angle = Math.atan2(deltaY, deltaX); const distance = Math.hypot(deltaX, deltaY); const limitedDistance = Math.min(distance, maxDistance); const stickX = Math.cos(angle) * limitedDistance; const stickY = Math.sin(angle) * limitedDistance; stick.style.transform = `translate(${stickX}px, ${stickY}px)`; touchMoveX = (deltaX / maxDistance); touchMoveY = (deltaY / maxDistance); touchMoveX = Math.max(-1, Math.min(1, touchMoveX)); touchMoveY = Math.max(-1, Math.min(1, touchMoveY)); }, { passive: false }); const resetJoystick = () => { joystickActive = false; stick.style.transform = 'translate(0, 0)'; touchMoveX = 0; touchMoveY = 0; }; joystick.addEventListener('touchend', resetJoystick); joystick.addEventListener('touchcancel', resetJoystick); actionButton.addEventListener('touchstart', (e) => { e.preventDefault(); isShooting = true; }, { passive: false }); actionButton.addEventListener('touchend', () => { isShooting = false; }); missileButton.addEventListener('touchstart', (e) => { e.preventDefault(); launchMissile(players[0]); }, { passive: false }); }
     initButton.onclick = initIntro;
 });
+
 
 
