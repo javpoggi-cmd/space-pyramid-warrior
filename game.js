@@ -1619,8 +1619,8 @@ laser.collidedEnemies.add(target);
             else if (target.type === 1) { queueFragment(3, target.x, target.y); queueFragment(3, target.x + target.width * 0.5, target.y + target.height * 0.5); }
             if (target.type === 3 && Math.random() < powerUpSpawnChance) {
             const rand = Math.random(); let type = 'health';
-            if (rand < 0.15) type = 'slowShot'; 
-            else if (rand < 0.30) type = 'rapidFire'; 
+            // if (rand < 0.15) type = 'slowShot'; 
+            if (rand < 0.30) type = 'rapidFire'; 
             else if (rand < 0.42) type = 'health'; 
             else if (rand < 0.52) type = 'shield'; 
             else if (rand < 0.62) type = 'extraLife'; 
@@ -1672,7 +1672,8 @@ laser.collidedEnemies.add(target);
             setTimeout(() => { smartBombOnCooldown = false; }, GAME_CONFIG.powerups.smartBombCooldown);
         } else if (Math.random() < powerUpSpawnChance) {
             const rand = Math.random(); let type = 'health';
-            if (rand < 0.15) type = 'slowShot'; else if (rand < 0.30) type = 'rapidFire'; else if (rand < 0.42) type = 'health'; else if (rand < 0.52) type = 'shield'; else if (rand < 0.62) type = 'extraLife'; else if (rand < 0.72) type = 'wingCannons'; else if (rand < 0.82) type = 'heavyCannon'; else if (rand < 0.92) type = 'drone'; else if (rand < 0.98) type = 'missileSystem'; else type = 'laser';
+            // if (rand < 0.15) type = 'slowShot'; 
+            if (rand < 0.30) type = 'rapidFire'; else if (rand < 0.42) type = 'health'; else if (rand < 0.52) type = 'shield'; else if (rand < 0.62) type = 'extraLife'; else if (rand < 0.72) type = 'wingCannons'; else if (rand < 0.82) type = 'heavyCannon'; else if (rand < 0.92) type = 'drone'; else if (rand < 0.98) type = 'missileSystem'; else type = 'laser';
             powerUps.push(new PowerUp(target.x, target.y, type));
         }
         
@@ -2422,3 +2423,4 @@ function launchMissile(player) { // <--- AHORA RECIBE EL JUGADOR
     function setupTouchControls() { const joystick = document.createElement('div'); joystick.id = 'joystick'; const stick = document.createElement('div'); stick.id = 'stick'; joystick.appendChild(stick); gameContainer.appendChild(joystick); const actionButton = document.createElement('div'); actionButton.id = 'actionButton'; actionButton.className = 'touch-button'; gameContainer.appendChild(actionButton); const missileButton = document.createElement('div'); missileButton.id = 'missileButton'; missileButton.className = 'touch-button'; gameContainer.appendChild(missileButton); let joystickActive = false; let joystickStartX, joystickStartY; joystick.addEventListener('touchstart', (e) => { e.preventDefault(); joystickActive = true; const touch = e.changedTouches[0]; joystickStartX = touch.clientX; joystickStartY = touch.clientY; }, { passive: false }); joystick.addEventListener('touchmove', (e) => { e.preventDefault(); if (!joystickActive) return; const touch = e.changedTouches[0]; const deltaX = touch.clientX - joystickStartX; const deltaY = touch.clientY - joystickStartY; const maxDistance = joystick.offsetWidth / 3; const angle = Math.atan2(deltaY, deltaX); const distance = Math.hypot(deltaX, deltaY); const limitedDistance = Math.min(distance, maxDistance); const stickX = Math.cos(angle) * limitedDistance; const stickY = Math.sin(angle) * limitedDistance; stick.style.transform = `translate(${stickX}px, ${stickY}px)`; touchMoveX = (deltaX / maxDistance); touchMoveY = (deltaY / maxDistance); touchMoveX = Math.max(-1, Math.min(1, touchMoveX)); touchMoveY = Math.max(-1, Math.min(1, touchMoveY)); }, { passive: false }); const resetJoystick = () => { joystickActive = false; stick.style.transform = 'translate(0, 0)'; touchMoveX = 0; touchMoveY = 0; }; joystick.addEventListener('touchend', resetJoystick); joystick.addEventListener('touchcancel', resetJoystick); actionButton.addEventListener('touchstart', (e) => { e.preventDefault(); isShooting = true; }, { passive: false }); actionButton.addEventListener('touchend', () => { isShooting = false; }); missileButton.addEventListener('touchstart', (e) => { e.preventDefault(); launchMissile(players[0]); }, { passive: false }); }
     initButton.onclick = initIntro;
 });
+
