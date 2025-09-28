@@ -5,7 +5,7 @@
   "display": "fullscreen",
   "background_color": "#000000",
   "theme_color": "#00ff00",
-  "orientation": "landscape-primary",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "img/player.png",
@@ -20,3 +20,4 @@
   ]
 
 }
+
